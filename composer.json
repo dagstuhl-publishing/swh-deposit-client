@@ -1,0 +1,23 @@
+{
+    "name": "dagstuhl/swh-deposit-client",
+    "description": "SoftwareHeritage Deposit API Client for PHP",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Dagstuhl\\SwhDepositClient\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Yannick Schillo",
+            "email": "yschillo@dagstuhl.de"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^7.9",
+        "nesbot/carbon": "^3.8"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^1.11"
+    }
+}
