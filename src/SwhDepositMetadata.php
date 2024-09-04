@@ -16,8 +16,8 @@ class SwhDepositMetadata
         "swhdeposit" => "https://www.softwareheritage.org/schema/2018/deposit",
     ];
 
-    public string $namespace;
-    public ?string $key;
+    public ?string $namespace = null;
+    public ?string $key = null;
     public array $attributes;
     public ?string $value;
 
@@ -26,17 +26,19 @@ class SwhDepositMetadata
 
     public function __construct(?string $key = null, array $attributes = [], ?string $value = null, array $children = [])
     {
-        $split = explode(":", $key, 2);
-        if(count($split) == 2) {
-            $this->namespace = $split[0];
-            $this->key = $split[1];
-        } else {
-            $this->namespace = static::DEFAULT_NAMESPACE;
-            $this->key = $key;
-        }
+        if($key !== null) {
+            $split = explode(":", $key, 2);
+            if(count($split) == 2) {
+                $this->namespace = $split[0];
+                $this->key = $split[1];
+            } else {
+                $this->namespace = static::DEFAULT_NAMESPACE;
+                $this->key = $key;
+            }
 
-        if(!isset(static::NAMESPACES[$this->namespace])) {
-            throw new \InvalidArgumentException("invalid namespace: {$this->namespace}");
+            if(!isset(static::NAMESPACES[$this->namespace])) {
+                throw new \InvalidArgumentException("invalid namespace: {$this->namespace}");
+            }
         }
 
         $this->attributes = $attributes;
@@ -105,22 +107,26 @@ class SwhDepositMetadata
         $dom->formatOutput = true;
 
         $root = $dom->createElementNS(static::NAMESPACES[static::DEFAULT_NAMESPACE], "entry");
-        foreach(static::NAMESPACES as $namespace => $url) {
-            if($namespace !== static::DEFAULT_NAMESPACE) {
-                $root->setAttribute("xmlns:$namespace", $url);
-            }
-        }
         $dom->appendChild($root);
 
+        $namespaces = [];
         foreach($this->children as $child) {
-            $child->addToDom($dom, $root);
+            $child->addToDom($dom, $namespaces, $root);
+        }
+
+        foreach(static::NAMESPACES as $namespace => $url) {
+            if($namespace !== static::DEFAULT_NAMESPACE && isset($namespaces[$namespace])) {
+                $root->setAttribute("xmlns:$namespace", $url);
+            }
         }
 
         return $dom;
     }
 
-    private function addToDom(DOMDocument $dom, DOMNode $root)
+    private function addToDom(DOMDocument $dom, array &$namespaces, DOMNode $root)
     {
+        $namespaces[$this->namespace] = true;
+
         $key = $this->namespace === static::DEFAULT_NAMESPACE ? $this->key : $this->namespace.":".$this->key;
         $element = $dom->createElement($key);
         $root->appendChild($element);
@@ -134,7 +140,7 @@ class SwhDepositMetadata
             $element->appendChild($text);
         } else {
             foreach($this->children as $child) {
-                $child->addToDom($dom, $element);
+                $child->addToDom($dom, $namespaces, $element);
             }
         }
     }
