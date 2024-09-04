@@ -36,6 +36,13 @@ class SwhDepositMetadata
         }
     }
 
+    public static function fromCodeMetaJson(string|object $json): SwhDepositMetadata
+    {
+        $metadata = new SwhDepositMetadata();
+        $metadata->importCodeMetaJson($json);
+        return $metadata;
+    }
+
     public function getKey(): string
     {
         return "{$this->namespace}:{$this->key}";
@@ -57,6 +64,26 @@ class SwhDepositMetadata
         $this->childrenByName[$key][] = $item;
 
         return $item;
+    }
+
+    public function importCodeMetaJson(string|object $json)
+    {
+        if(is_string($json)) {
+            $json = json_decode($json);
+        }
+        foreach($json as $key => $value) {
+            if(str_starts_with($key, "@")) {
+                continue;
+            }
+            $children = is_array($value) ? $value : [ $value ];
+            foreach($children as $child) {
+                if(is_string($child)) {
+                    $this->add("codemeta:$key", [], $child);
+                } else {
+                    $this->add("codemeta:$key")->importCodeMetaJson($child);
+                }
+            }
+        }
     }
 
     public function generateDOMDocument(?DOMDocument $dom = null): DOMDocument
