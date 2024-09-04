@@ -7,7 +7,16 @@ use \DOMNode;
 
 class SwhDepositMetadata
 {
-    public ?string $namespace;
+    const DEFAULT_NAMESPACE = "atom";
+
+    const NAMESPACES = [
+        "atom" => "http://www.w3.org/2005/Atom",
+        "dcterms" => "http://purl.org/dc/terms/",
+        "codemeta" => "https://doi.org/10.5063/SCHEMA/CODEMETA-2.0",
+        "swhdeposit" => "https://www.softwareheritage.org/schema/2018/deposit",
+    ];
+
+    public string $namespace;
     public ?string $key;
     public array $attributes;
     public ?string $value;
@@ -22,8 +31,12 @@ class SwhDepositMetadata
             $this->namespace = $split[0];
             $this->key = $split[1];
         } else {
-            $this->namespace = "atom";
+            $this->namespace = static::DEFAULT_NAMESPACE;
             $this->key = $key;
+        }
+
+        if(!isset(static::NAMESPACES[$this->namespace])) {
+            throw new \InvalidArgumentException("invalid namespace: {$this->namespace}");
         }
 
         $this->attributes = $attributes;
@@ -91,10 +104,12 @@ class SwhDepositMetadata
         $dom = new DOMDocument("1.0", "UTF-8");
         $dom->formatOutput = true;
 
-        $root = $dom->createElementNS("http://www.w3.org/2005/Atom", "entry");
-        $root->setAttribute("xmlns:dcterms", "http://purl.org/dc/terms/");
-        $root->setAttribute("xmlns:codemeta", "https://doi.org/10.5063/SCHEMA/CODEMETA-2.0");
-        $root->setAttribute("xmlns:swhdeposit", "https://www.softwareheritage.org/schema/2018/deposit");
+        $root = $dom->createElementNS(static::NAMESPACES[static::DEFAULT_NAMESPACE], "entry");
+        foreach(static::NAMESPACES as $namespace => $url) {
+            if($namespace !== static::DEFAULT_NAMESPACE) {
+                $root->setAttribute("xmlns:$namespace", $url);
+            }
+        }
         $dom->appendChild($root);
 
         foreach($this->children as $child) {
@@ -106,7 +121,7 @@ class SwhDepositMetadata
 
     private function addToDom(DOMDocument $dom, DOMNode $root)
     {
-        $key = $this->namespace === "atom" ? $this->key : $this->namespace.":".$this->key;
+        $key = $this->namespace === static::DEFAULT_NAMESPACE ? $this->key : $this->namespace.":".$this->key;
         $element = $dom->createElement($key);
         $root->appendChild($element);
 
