@@ -63,6 +63,16 @@ class SwhDepositMetadata
         return "{$this->namespace}:{$this->key}";
     }
 
+    public function getAttributes(): array
+    {
+        return $this->attributes;
+    }
+
+    public function getValue(): ?string
+    {
+        return $this->value;
+    }
+
     public function add(string $key, array $attributes = [], ?string $value = null, ?array $children = []): SwhDepositMetadata
     {
         return $this->addItem(new SwhDepositMetadata($key, $attributes, $value, $children));
@@ -81,6 +91,21 @@ class SwhDepositMetadata
         return $item;
     }
 
+    public function exists(string $key): bool
+    {
+        return isset($this->childrenByName[$key]);
+    }
+
+    public function getFirst(string $key): ?SwhDepositMetadata
+    {
+        return $this->childrenByName[$key][0] ?? null;
+    }
+
+    public function getAll(string $key): array
+    {
+        return $this->childrenByName[$key] ?? [];
+    }
+
     public function importCodeMetaJson(string|object $json)
     {
         if(is_string($json)) {
@@ -96,6 +121,20 @@ class SwhDepositMetadata
                     $this->add("codemeta:$key", [], $child);
                 } else {
                     $this->add("codemeta:$key")->importCodeMetaJson($child);
+                }
+            }
+        }
+    }
+
+    public function fillMissingMetadata()
+    {
+        foreach($this->getAll("codemeta:author") ?? [] as $author) {
+            if(!$author->exists("codemeta:name")) {
+                $givenName = $author->getFirst("codemeta:givenName")?->getValue() ?? "";
+                $familyName = $author->getFirst("codemeta:familyName")?->getValue() ?? "";
+                $name = trim("{$givenName} {$familyName}");
+                if($name !== "") {
+                    $author->add("codemeta:name", [], $name);
                 }
             }
         }
