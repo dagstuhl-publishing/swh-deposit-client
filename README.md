@@ -4,7 +4,7 @@ A SoftwareHeritage Deposit API Client for PHP.
 
 ## License
 
-TODO
+This project is licensed under the MIT license. See [LICENSE.md](LICENSE.md) for details.
 
 ## Install
 
