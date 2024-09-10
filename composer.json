@@ -1,18 +1,23 @@
 {
     "name": "dagstuhl/swh-deposit-client",
-    "description": "SoftwareHeritage Deposit API Client for PHP",
     "type": "library",
-    "autoload": {
-        "psr-4": {
-            "Dagstuhl\\SwhDepositClient\\": "src/"
-        }
-    },
+    "description": "SoftwareHeritage Deposit API Client for PHP",
+    "keywords": [
+        "SoftwareHeritage",
+        "software archiving"
+    ],
+    "license": "MIT",
     "authors": [
         {
             "name": "Yannick Schillo",
             "email": "yschillo@dagstuhl.de"
         }
     ],
+    "autoload": {
+        "psr-4": {
+            "Dagstuhl\\SwhDepositClient\\": "src/"
+        }
+    },
     "require": {
         "guzzlehttp/guzzle": "^7",
         "nesbot/carbon": "^2||^3"
