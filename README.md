@@ -8,7 +8,9 @@ This project is licensed under the MIT license. See [LICENSE.md](LICENSE.md) for
 
 ## Install
 
-TODO
+```
+composer require dagstuhl/swh-deposit-client
+```
 
 ## Example
 
