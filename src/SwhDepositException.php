@@ -15,7 +15,7 @@ class SwhDepositException extends RequestException
 
     public function __construct(RequestException $ex)
     {
-        $this->swhDepositResponse = new SwhDepositResponse($ex->getResponse());
+        $this->swhDepositResponse = SwhDepositResponse::fromResponse($ex->getResponse());
         parent::__construct($ex->message, $ex->getRequest(), $ex->getResponse(), $ex);
     }
 

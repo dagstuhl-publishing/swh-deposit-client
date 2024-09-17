@@ -163,7 +163,7 @@ class SwhDepositClient
         try {
             $path = ltrim($path, "/");
             $response = $this->client->request($method, $path, $args);
-            return new SwhDepositResponse($response);
+            return SwhDepositResponse::fromResponse($response);
         } catch(RequestException $ex) {
             throw new SwhDepositException($ex);
         }

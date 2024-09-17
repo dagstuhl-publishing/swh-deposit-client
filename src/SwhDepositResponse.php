@@ -9,7 +9,7 @@ use \DOMXPath;
 
 class SwhDepositResponse
 {
-    private ResponseInterface $response;
+    private ?ResponseInterface $response;
     private string $responseBody;
     private ?DOMDocument $document = null;
     private ?DOMXPath $xpath = null;
@@ -18,13 +18,14 @@ class SwhDepositResponse
     private ?CarbonImmutable $depositDate = null;
     private ?string $depositArchive = null;
     private ?SwhDepositStatus $depositStatus = null;
+    private ?string $depositStatusDetail = null;
     private ?string $depositSwhId = null;
     private ?string $depositSwhIdContext = null;
 
-    public function __construct(ResponseInterface $response)
+    public function __construct(?ResponseInterface $response, string $responseBody)
     {
         $this->response = $response;
-        $this->responseBody = $response->getBody()->getContents();
+        $this->responseBody = $responseBody;
 
         $document = new DOMDocument();
         if($document->loadXML($this->responseBody, LIBXML_NOERROR)) {
@@ -45,9 +46,20 @@ class SwhDepositResponse
             if(($status = $this->get("//atom:entry/swhdeposit:deposit_status")) !== null) {
                 $this->depositStatus = SwhDepositStatus::from($status);
             }
+            $this->depositStatusDetail = $this->get("//atom:entry/swhdeposit:deposit_status_detail");
             $this->depositSwhId = $this->get("//atom:entry/swhdeposit:deposit_swh_id");
             $this->depositSwhIdContext = $this->get("//atom:entry/swhdeposit:deposit_swh_id_context");
         }
+    }
+
+    public static function fromResponse(ResponseInterface $response): SwhDepositResponse
+    {
+        return new SwhDepositResponse($response, $response->getBody()->getContents());
+    }
+
+    public static function fromResponseBody(string $responseBody): SwhDepositResponse
+    {
+        return new SwhDepositResponse(null, $responseBody);
     }
 
     public function getResponse(): ResponseInterface
@@ -93,6 +105,11 @@ class SwhDepositResponse
     public function getDepositStatus(): ?SwhDepositStatus
     {
         return $this->depositStatus;
+    }
+
+    public function getDepositStatusDetail(): ?string
+    {
+        return $this->depositStatusDetail;
     }
 
     public function getDepositSwhId(): ?string
