@@ -51,10 +51,10 @@ class SwhDepositMetadata
         }
     }
 
-    public static function fromCodeMetaJson(string|object $json): SwhDepositMetadata
+    public static function fromCodemetaJson(string|object $json): SwhDepositMetadata
     {
         $metadata = new SwhDepositMetadata();
-        $metadata->importCodeMetaJson($json);
+        $metadata->importCodemetaJson($json);
         return $metadata;
     }
 
@@ -106,7 +106,7 @@ class SwhDepositMetadata
         return $this->childrenByName[$key] ?? [];
     }
 
-    public function importCodeMetaJson(string|object $json)
+    public function importCodemetaJson(string|object $json)
     {
         if(is_string($json)) {
             $json = json_decode($json);
@@ -120,7 +120,7 @@ class SwhDepositMetadata
                 if(is_string($child)) {
                     $this->add("codemeta:$key", [], $child);
                 } else {
-                    $this->add("codemeta:$key")->importCodeMetaJson($child);
+                    $this->add("codemeta:$key")->importCodemetaJson($child);
                 }
             }
         }

@@ -27,10 +27,10 @@ $metadata = new SwhDepositMetadata();
 $metadata->add("title", [], "Awesome Project");
 $metadata->add("author", [], "Yannick Schillo");
 
-// Import CodeMeta-JSON
+// Import Codemeta-JSON
 $codemetaJson = json_decode("...");
-$metadata->importCodeMetaJson($codemetaJson);
-// Alternatively: $metadata = SwhDepositMetadata::fromCodeMetaJson($codemetaJson);
+$metadata->importCodemetaJson($codemetaJson);
+// Alternatively: $metadata = SwhDepositMetadata::fromCodemetaJson($codemetaJson);
 
 $depositMetadata = $metadata->add("swhdeposit:deposit");
 $createOrigin = $depositMetadata->add("swhdeposit:create_origin");
