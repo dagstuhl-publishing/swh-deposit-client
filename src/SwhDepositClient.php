@@ -10,6 +10,11 @@ use \DOMDocument;
 
 class SwhDepositClient
 {
+    const SUPPORTED_CONTENT_TYPES = [
+        "application/zip" => "zip",
+        "application/x-tar" => "tar",
+    ];
+
     private Client $client;
 
     public function __construct(string $baseUrl, string $username, string $password)
@@ -55,7 +60,7 @@ class SwhDepositClient
                         "headers" => [
                             "Content-Type" => $contentType,
                         ],
-                        "filename" => "archive",
+                        "filename" => static::getArchiveFilename($contentType),
                         "contents" => $archive,
                     ],
                 ],
@@ -74,7 +79,7 @@ class SwhDepositClient
             return $this->request("POST", "/1/{$collectionName}/", [
                 "headers" => [
                     "Content-Type" => $contentType,
-                    "Content-Disposition" => "attachment; filename=archive",
+                    "Content-Disposition" => "attachment; filename=".static::getArchiveFilename($contentType),
                     "In-Progress" => $final ? "false" : "true",
                 ],
                 "body" => $archive,
@@ -125,7 +130,7 @@ class SwhDepositClient
         return $this->request($replace ? "PUT" : "POST", "/1/{$collectionName}/{$depositId}/media/", [
             "headers" => [
                 "Content-Type" => $contentType,
-                "Content-Disposition" => "attachment; filename=archive",
+                "Content-Disposition" => "attachment; filename=".static::getArchiveFilename($contentType),
                 "In-Progress" => $final ? "false" : "true",
             ],
             "body" => $archive,
@@ -162,5 +167,14 @@ class SwhDepositClient
         } catch(RequestException $ex) {
             throw new SwhDepositException($ex);
         }
+    }
+
+    private static function getArchiveFilename(string $contentType): string
+    {
+        $extension = static::SUPPORTED_CONTENT_TYPES[$contentType] ?? null;
+        if($extension === null) {
+            throw new \InvalidArgumentException("unsupported content type: {$contentType}");
+        }
+        return "archive.{$extension}";
     }
 }
