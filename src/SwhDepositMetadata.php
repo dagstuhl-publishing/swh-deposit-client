@@ -112,7 +112,9 @@ class SwhDepositMetadata
             $json = json_decode($json);
         }
         foreach($json as $key => $value) {
-            if(str_starts_with($key, "@")) {
+            if($key === "@id") {
+                $key = "id";
+            } else if(str_starts_with($key, "@")) {
                 continue;
             }
             $children = is_array($value) ? $value : [ $value ];
