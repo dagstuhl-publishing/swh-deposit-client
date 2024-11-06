@@ -1,3 +1,6 @@
+[![SWH](https://archive.softwareheritage.org/badge/swh:1:dir:92742c9c9cbb1eb3ddca8c5fd0b72a22e82f28d4/)](https://archive.softwareheritage.org/swh:1:dir:92742c9c9cbb1eb3ddca8c5fd0b72a22e82f28d4;origin=https://github.com/dagstuhl-publishing/swh-deposit-client;visit=swh:1:snp:f987590d89934bb2ce036a8374fa3f04a9c94fc5;anchor=swh:1:rev:82625c08d614224624afefce6ee9b2b138cbc464)
+
+
 # SwhDepositClient
 
 A SoftwareHeritage Deposit API Client for PHP.
